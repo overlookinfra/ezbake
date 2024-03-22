@@ -190,12 +190,11 @@ if options.output_type == 'rpm'
     options.systemd_el = 1
   elsif options.operating_system == :el && options.os_version >= 7 # systemd el
     if ! options.is_pe
-      options.java =
-        if options.os_version == 7
-          'java-11-openjdk-headless'
-        else
-          'java-17-openjdk-headless'
-        end
+      if options.os_version == 7
+        options.java = 'java-11-openjdk-headless'
+      else
+        options.java = 'java-17-openjdk-headless'
+      end
     end
 
     options.systemd = 1
