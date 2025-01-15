@@ -270,7 +270,7 @@ if options.output_type == 'rpm'
   end
 
   fpm_opts << "--config-files /etc/puppetlabs/#{options.realname}"
-  fpm_opts << "--config-files /etc/sysconfig/#{options.name}"
+  fpm_opts << "--config-files /etc/sysconfig/#{options.realname}"
 
   options.additional_dirs.each do |dir|
     fpm_opts << "--directories #{dir}"
@@ -282,7 +282,7 @@ if options.output_type == 'rpm'
   end
 
   if options.logrotate
-    fpm_opts << "--config-files /etc/logrotate.d/#{options.name}"
+    fpm_opts << "--config-files /etc/logrotate.d/#{options.realname}"
   end
 
   fpm_opts << "--directories #{options.app_logdir}"
@@ -366,16 +366,11 @@ termini_opts << "--name #{options.name}-termini"
 termini_opts << "--description '#{options.termini_description}'" unless options.termini_description.nil?
 shared_opts << "--version #{options.version}"
 shared_opts << "--iteration #{options.release}"
-shared_opts << "--vendor 'Puppet Labs <info@puppetlabs.com>'"
-shared_opts << "--maintainer 'Puppet Labs <info@puppetlabs.com>'"
+shared_opts << "--vendor 'Vox Pupuli <openvox@voxpupuli.org>'"
+shared_opts << "--maintainer 'Vox Pupuli <openvox@voxpupuli.org>'"
+shared_opts << "--license 'ASL 2.0'"
 
-if options.is_pe
-  shared_opts << "--license 'PL Commercial'"
-else
-  shared_opts << "--license 'ASL 2.0'"
-end
-
-shared_opts << "--url http://puppet.com"
+shared_opts << "--url http://github.com/openvoxproject"
 shared_opts << "--architecture all"
 
 options.replaces.each do |pkg, version|
@@ -384,8 +379,8 @@ options.replaces.each do |pkg, version|
     fpm_opts << "--conflicts '#{pkg} <= #{version}-1'"
   elsif options.output_type == 'deb'
     # why debian, why.
-    fpm_opts << "--replaces '#{pkg} (<< #{version}-1puppetlabs1)'"
-    fpm_opts << "--conflicts '#{pkg} (<< #{version}-1puppetlabs1)'"
+    fpm_opts << "--replaces '#{pkg} (<< #{version}-1openvox1)'"
+    fpm_opts << "--conflicts '#{pkg} (<< #{version}-1openvox1)'"
     fpm_opts << "--replaces '#{pkg} (<< #{version}-1#{options.dist})'"
     fpm_opts << "--conflicts '#{pkg} (<< #{version}-1#{options.dist})'"
   end
@@ -405,7 +400,7 @@ fpm_opts << "--depends /usr/bin/which" if options.output_type == 'rpm'
 fpm_opts << "--depends adduser" if options.output_type == 'deb'
 fpm_opts << "--depends procps"
 
-termini_opts << "--depends puppet-agent"
+termini_opts << "--depends openvox-agent"
 
 options.additional_dependencies.each do |dep|
   fpm_opts << "--depends '#{dep}'"

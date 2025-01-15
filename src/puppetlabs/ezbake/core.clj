@@ -74,6 +74,7 @@
    (schema/optional-key :group) schema/Str
    (schema/optional-key :puppet-platform-version) schema/Int
    (schema/optional-key :bootstrap-source) BootstrapSource
+   (schema/optional-key :package-name) schema/Str
    (schema/optional-key :create-dirs) [schema/Str]
    (schema/optional-key :build-type) schema/Str
    (schema/optional-key :reload-timeout) schema/Int
@@ -263,7 +264,7 @@
     (spit
      (fs/file staging-dir "ext" "ezbake.manifest")
      (stencil/render-string "
-This package was built by the Puppet Labs packaging system.
+This package was built by the OpenVox packaging system.
 
 EZBake version: {{{ezbake-version}}}
 Release package: {{{package-group}}}/{{{package-name}}} ({{{package-version}}})
@@ -594,6 +595,8 @@ Additional uberjar dependencies:
         get-local #(get-local-ezbake-var lein-project %1 %2)
         local->ruby #(as-ruby-literal (get-local %1 %2))]
     {:project                            (as-ruby-literal (:name lein-project))
+     :package-name                       (as-ruby-literal (-> (get-in lein-project [:lein-ezbake :vars :package-name])
+                                              (or (:name lein-project))))
      :packaging-version                  (-> (:version lein-project)
                                              generate-package-version-from-version
                                              as-ruby-literal)

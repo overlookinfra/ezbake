@@ -1,6 +1,6 @@
-(defproject puppetlabs/lein-ezbake "2.6.3-SNAPSHOT"
+(defproject openvox/lein-ezbake "2.6.3-SNAPSHOT"
   :description "A system for building packages for trapperkeeper-based applications"
-  :url "https://github.com/puppetlabs/ezbake"
+  :url "https://github.com/openvoxproject/ezbake"
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
 
@@ -15,11 +15,11 @@
                  ["snapshots" "https://artifactory.delivery.puppetlabs.net/artifactory/clojure-snapshots__local/"]]
 
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
-                                     :username :env/clojars_jenkins_username
-                                     :password :env/clojars_jenkins_password
+                                     :username :env/clojars_username
+                                     :password :env/clojars_password
                                      :sign-releases false}]]
 
-  :scm {:name "git" :url "https://github.com/puppetlabs/ezbake"}
+  :scm {:name "git" :url "https://github.com/openvoxproject/ezbake"}
 
   :resource-paths ["resources/"]
 
