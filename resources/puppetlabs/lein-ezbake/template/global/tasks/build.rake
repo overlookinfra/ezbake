@@ -82,7 +82,7 @@ namespace :pl do
         stdout, stderr, exitstatus = Pkg::Util::Execution.capture3(%(bash controller.sh debian #{platform} #{staging_path}))
         Pkg::Util::Execution.success?(exitstatus) or raise "Error running packaging: #{stdout}\n#{stderr}"
         puts "#{stdout}\n#{stderr}"
-        FileUtils.cp(Dir.glob("*#{platform}*.deb"), "#{pkg_path}/#{platform_path}")
+        FileUtils.cp(Dir.glob("*.deb"), "#{pkg_path}/#{platform_path}")
       end
       FileUtils.cp_r(pkg_path, nested_output)
       FileUtils.rm_r(staging_path)

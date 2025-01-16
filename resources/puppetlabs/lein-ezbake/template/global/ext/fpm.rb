@@ -332,7 +332,7 @@ if options.output_type == 'rpm'
 #deb specific options
 elsif options.output_type == 'deb'
   if options.dist != "#{options.operating_system}#{options.os_version}"
-    options.release = "#{options.release}#{options.dist}"
+    options.release = "#{options.release}+#{options.dist}"
   end
 
   if ! options.is_pe
