@@ -204,7 +204,7 @@ if options.output_type == 'rpm'
             fail "Unrecognized el os version #{options.os_version}"
           end
         when 7
-          'java-1.8.0-openjdk-headless'
+          'java-11-openjdk-headless'
         else
           fail "Unknown Puppet Platform Version #{options.platform_version}"
         end
