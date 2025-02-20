@@ -192,10 +192,8 @@ if options.output_type == 'rpm'
       options.java =
         if options.os_version == 7
           'java-11-openjdk-headless'
-        elsif options.os_version >= 8
-          'java-17-openjdk-headless'
         else
-          fail "Unrecognized el os version #{options.os_version}"
+          'java-17-openjdk-headless'
         end
     end
 
