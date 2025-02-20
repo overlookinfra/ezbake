@@ -40,6 +40,7 @@
                     :is-pe-build "false"
                     :reload-timeout "'120'"
                     :bootstrap-source "'bootstrap-cfg'"
+                    :package-name "'dummy'"
                     :debian-interested-install-triggers ()
                     :group "'dummy'"
                     :java-args "'-Xmx192m'"
