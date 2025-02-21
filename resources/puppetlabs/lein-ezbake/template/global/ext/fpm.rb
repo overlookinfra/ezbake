@@ -6,12 +6,8 @@ require 'ostruct'
 
 options = OpenStruct.new
 # settin' some defaults
-options.systemd = 0
-options.sysvinit = 0
 options.systemd_el = 0
 options.systemd_sles = 0
-options.old_el = 0
-options.old_sles = 0
 options.sles = 0
 options.java = 'java-1.8.0-openjdk-headless'
 options.release = 1
@@ -140,17 +136,9 @@ fail "--dist is required!" if options.output_type == 'deb' && options.dist.nil?
 if options.sources.empty?
   options.sources = case options.operating_system
                     when :amazon, :fedora, :sles, :el, :redhatfips
-                      if options.operating_system == :el && options.os_version < 7 || options.operating_system == :sles && options.os_version < 12 #sysv rpm platforms
-                        ['etc', 'opt', 'var']
-                      else
-                        ['etc', 'opt', 'usr', 'var']
-                      end
+                      ['etc', 'opt', 'usr', 'var']
                     when :debian, :ubuntu
-                      if options.dist == 'trusty' #trusty is the only sysv deb we build for right now
-                        ['etc', 'opt', 'var']
-                      else
-                        ['etc', 'lib', 'opt', 'usr', 'var']
-                      end
+                      ['etc', 'lib', 'opt', 'usr', 'var']
                     else
                       fail "I don't know what your default sources should be, pass it on the command line!"
                     end
@@ -162,7 +150,6 @@ shared_opts = Array('')
 termini_opts = Array('')
 
 options.app_logdir = "/var/log/puppetlabs/#{options.realname}"
-options.app_rundir = "/var/run/puppetlabs/#{options.realname}"
 options.app_prefix = "/opt/puppetlabs/server/apps/#{options.realname}"
 options.app_data = "/opt/puppetlabs/server/data/#{options.realname}"
 
@@ -172,12 +159,10 @@ if options.output_type == 'rpm'
   shared_opts << "--rpm-digest sha256"
   shared_opts << "--rpm-rpmbuild-define 'rpmversion #{options.version}'"
   fpm_opts << "--rpm-rpmbuild-define '_app_logdir #{options.app_logdir}'"
-  fpm_opts << "--rpm-rpmbuild-define '_app_rundir #{options.app_rundir}'"
   fpm_opts << "--rpm-rpmbuild-define '_app_prefix #{options.app_prefix}'"
   fpm_opts << "--rpm-rpmbuild-define '_app_data #{options.app_data}'"
 
   if options.operating_system == :fedora # all supported fedoras are systemd
-    options.systemd = 1
     options.systemd_el = 1
   elsif options.operating_system == :amazon
     if ! options.is_pe
@@ -185,9 +170,8 @@ if options.output_type == 'rpm'
       options.java = '(java-17-amazon-corretto-headless or java-11-amazon-corretto-headless)'
     end
 
-    options.systemd = 1
     options.systemd_el = 1
-  elsif options.operating_system == :el && options.os_version >= 7 # systemd el
+  elsif options.operating_system == :el
     if ! options.is_pe
       options.java =
         if options.os_version == 7
@@ -199,44 +183,24 @@ if options.output_type == 'rpm'
         end
     end
 
-    options.systemd = 1
     options.systemd_el = 1
-  elsif options.operating_system == :el # old el
-    options.sysvinit = 1
-    options.old_el = 1
-  elsif options.operating_system == :redhatfips && options.os_version >= 7 # systemd redhatfips
-    options.systemd = 1
+  elsif options.operating_system == :redhatfips
     options.systemd_el = 1
-  elsif options.operating_system == :sles && options.os_version >= 12 # systemd sles
-    options.systemd = 1
+  elsif options.operating_system == :sles
     options.systemd_sles = 1
     options.sles = 1
     if ! options.is_pe
       options.java = 'java-11-openjdk-headless'
     end
-  elsif options.operating_system == :sles #old sles
-    options.sysvinit = 1
-    options.old_sles = 1
   end
 
-  fpm_opts << "--rpm-rpmbuild-define '_with_sysvinit #{options.sysvinit}'"
-  fpm_opts << "--rpm-rpmbuild-define '_with_systemd #{options.systemd}'"
-  fpm_opts << "--rpm-rpmbuild-define '_old_sles #{options.old_sles}'"
   fpm_opts << "--rpm-rpmbuild-define '_systemd_el #{options.systemd_el}'"
   fpm_opts << "--rpm-rpmbuild-define '_systemd_sles #{options.systemd_sles}'"
-  fpm_opts << "--rpm-rpmbuild-define '_old_el #{options.old_el}'"
   fpm_opts << "--rpm-rpmbuild-define '_sysconfdir /etc'"
   fpm_opts << "--rpm-rpmbuild-define '_prefix #{options.app_prefix}'"
-  fpm_opts << "--rpm-rpmbuild-define '_rundir /var/run'"
   fpm_opts << "--rpm-rpmbuild-define '__jar_repack 0'"
 
   shared_opts << "--rpm-dist #{options.dist}"
-
-  if options.old_el == 1
-    fpm_opts << "--depends chkconfig"
-  elsif options.old_sles == 1
-    fpm_opts << "--depends aaa_base"
-  end
 
   if options.systemd_el == 1
     fpm_opts << "--depends systemd"
@@ -264,7 +228,6 @@ if options.output_type == 'rpm'
 
   fpm_opts << "--directories #{options.app_logdir}"
   fpm_opts << "--directories /etc/puppetlabs/#{options.realname}"
-  fpm_opts << "--directories #{options.app_rundir}"
   shared_opts << "--rpm-auto-add-directories"
   fpm_opts << "--rpm-auto-add-exclude-directories /etc/puppetlabs"
   shared_opts << "--rpm-auto-add-exclude-directories /opt/puppetlabs"
@@ -281,7 +244,6 @@ if options.output_type == 'rpm'
   fpm_opts << "--rpm-auto-add-exclude-directories /etc/rc.d/init.d"
   fpm_opts << "--rpm-auto-add-exclude-directories /usr/lib/tmpfiles.d"
   fpm_opts << "--rpm-auto-add-exclude-directories /var/log/puppetlabs"
-  fpm_opts << "--rpm-auto-add-exclude-directories /var/run/puppetlabs"
   termini_opts << "--rpm-auto-add-exclude-directories /opt/puppetlabs/puppet"
   termini_opts << "--rpm-auto-add-exclude-directories /opt/puppetlabs/puppet/lib"
   termini_opts << "--rpm-auto-add-exclude-directories /opt/puppetlabs/puppet/lib/ruby"
@@ -301,7 +263,6 @@ if options.output_type == 'rpm'
   fpm_opts << "--rpm-attr 750,#{options.user},#{options.group}:/etc/puppetlabs/#{options.realname}"
   fpm_opts << "--rpm-attr 750,#{options.user},#{options.group}:#{options.app_logdir}"
   fpm_opts << "--rpm-attr -,#{options.user},#{options.group}:#{options.app_data}"
-  fpm_opts << "--rpm-attr 755,#{options.user},#{options.group}:#{options.app_rundir}"
 
   fpm_opts << "--edit"
   fpm_opts << "--category 'System Environment/Daemons'"
